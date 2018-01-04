@@ -12,7 +12,11 @@ class Home extends Component {
         return (
             <div>
                 <h2>This is the home page</h2>
-
+                <Link to='/Tetris'><button className='button1'>Go to Tetris</button></Link>
+                <br></br>
+                <br></br>
+                <br></br>
+                <Link to='/Jukebox'><button className='button1'>Go to Jukebox</button></Link>
 
 
             </div>
