@@ -13,12 +13,13 @@ class Tetris extends Component {
     }
     render() {
         return (
+            <div className="tetrisStyle">
             <div>
                 <h2>This is the Tetris page</h2>
-
-            <canvas id="tetris" width="240" height="400"></canvas>
+            <div>Score : <span id="score"></span></div>
+            <canvas id="tetris" className="tetrisCanvas" width="240" height="400"></canvas>
             
-           
+           </div>
 
 
             </div>

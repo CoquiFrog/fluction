@@ -11,6 +11,24 @@ const matrix = [
     [0, 1, 0],
 ];
 
+function arenaSweep(){
+    let rowCount = 1;
+    outer: for (let y = arena.length - 1; y > 0; --y){
+        for (let x=0; x < arena[y].length; ++x){
+            if (arena[y][x] === 0){
+                continue outer;
+            }
+        }
+        const row = arena.splice(y,1)[0].fill(0).fill(0);
+        arena.unshift(row);
+        ++y;
+
+        player.score += rowCount * 10;
+        rowCount *= 2;
+    }
+}
+
+
 function collide(arena, player) {
     const [m, o] = [player.matrix, player.pos];
     for (let y = 0; y < m.length; ++y) {
@@ -46,44 +64,43 @@ function createPiece(type) {
         ];
     } else if (type === 'L') {
         return [
-
-            [0, 1, 0],
-            [0, 1, 0],
-            [0, 1, 1],
+            [0, 2, 0],
+            [0, 2, 0],
+            [0, 2, 2],
         ];
 
-    } else if (type === 'O'){
-        return[
-            [1, 1],
-            [1, 1],
-        ];
-    } else if (type === 'J'){
-        return[
-            [0, 1, 0],
-            [0, 1, 0],
-            [1, 1, 0],
-        ];
-    } else if (type === 'I'){
+    } else if (type === 'O') {
         return [
-            [0, 1, 0, 0],
-            [0, 1, 0, 0],
-            [0, 1, 0, 0],
-            [0, 1, 0, 0],
-        ]
-    } else if (type === 'S'){
-        return[
-                [0, 1, 1],
-                [1, 1, 0],
-                [0, 0, 0],
-            ];
-        
-    } else if (type === 'Z'){
-        return[
-                [1, 1, 0],
-                [0, 1, 1],
-                [0, 0, 0],
-            ];
-}
+            [3, 3],
+            [3, 3],
+        ];
+    } else if (type === 'J') {
+        return [
+            [0, 4, 0],
+            [0, 4, 0],
+            [4, 4, 0],
+        ];
+    } else if (type === 'I') {
+        return [
+            [0, 5, 0, 0],
+            [0, 5, 0, 0],
+            [0, 5, 0, 0],
+            [0, 5, 0, 0],
+        ];
+    } else if (type === 'S') {
+        return [
+            [0, 6, 6],
+            [6, 6, 0],
+            [0, 0, 0],
+        ];
+
+    } else if (type === 'Z') {
+        return [
+            [7, 7, 0],
+            [0, 7, 7],
+            [0, 0, 0],
+        ];
+    }
 }
 
 function draw() {
@@ -99,7 +116,7 @@ function drawMatrix(matrix, offset) {
     matrix.forEach((row, y) => {
         row.forEach((value, x) => {
             if (value !== 0) {
-                context.fillStyle = 'blue';
+                context.fillStyle = colors[value];
                 context.fillRect(x + offset.x,
                     y + offset.y, 1, 1);
             }
@@ -123,7 +140,10 @@ function playerDrop() {
     if (collide(arena, player)) {
         player.pos.y--;
         merge(arena, player);
-        player.pos.y = 0;
+        playerReset();
+        arenaSweep();
+        updateScore();
+        // player.pos.y = 0;
     }
 
     dropCounter = 0;
@@ -134,6 +154,20 @@ function playerMove(dir) {
     if (collide(arena, player)) {
         player.pos.x -= dir;
     }
+}
+
+function playerReset() {
+    const pieces = 'TLOJISZ';
+    player.matrix = createPiece(pieces[pieces.length * Math.random() | 0]);
+    player.pos.y = 0;
+    player.pos.x = (arena[0].length / 2 | 0) -
+        (player.matrix[0].length / 2 | 0);
+        if (collide(arena, player)){
+            arena.forEach(row => row.fill(0));
+        player.score = 0;
+        updateScore();
+        }
+
 }
 
 function playerRotate(dir) {
@@ -171,7 +205,9 @@ function rotate(matrix, dir) {
     }
 }
 
-
+function updateScore(){
+    document.getElementById('score').innerText = player.score;
+}
 
 
 
@@ -198,9 +234,22 @@ function update(time = 0) {
 
 }
 
+const colors = [
+    null,
+    'red',
+    'blue',
+    'yellow',
+    'green',
+    'purple',
+    'orange',
+    'pink',
+
+];
+
 const player = {
-    pos: { x: 5, y: 5 },
-    matrix: createPiece('T'),
+    pos: { x: 0, y:0 },
+    matrix: null,
+    score: 0,
 }
 
 document.addEventListener('keydown', event => {
@@ -217,4 +266,6 @@ document.addEventListener('keydown', event => {
     }
 });
 
+playerReset();
+updateScore();
 update();
